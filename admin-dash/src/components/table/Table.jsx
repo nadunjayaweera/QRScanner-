@@ -205,6 +205,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+
 const Datatable = () => {
   const [dateRange, setDateRange] = useState([
     {
@@ -271,6 +274,25 @@ const Datatable = () => {
     fetchTableData();
   };
 
+  const exportAsPDF = () => {
+    const doc = new jsPDF();
+
+    // Create the data for the table (excluding the subtotal)
+    const tableData = filteredRows.map((row) => [
+      row.qrCodeData,
+      row.quantity,
+      row.note,
+    ]);
+
+    // Add the table
+    doc.autoTable({
+      head: [["QR CodeData", "Quantity", "Note"]],
+      body: tableData,
+    });
+    // Save the PDF
+    doc.save("checkout_data.pdf");
+  };
+
   return (
     <div className="datatable">
       <div className="datatableTitle">
@@ -280,6 +302,7 @@ const Datatable = () => {
           ranges={dateRange}
         />
         <button onClick={handleFilter}>Apply Filter</button>
+        <button onClick={exportAsPDF}>PDF</button>
       </div>
       <TableContainer component={Paper}>
         <Table>
