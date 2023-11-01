@@ -245,7 +245,7 @@ const Datatable = () => {
         .split("=")[1];
 
       const response = await fetch(
-        `https://backscan.tfdatamaster.com:4003/api/dashboard/products?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+        `https://backscan.tfdatamaster.com/api/dashboard/products?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
         {
           method: "GET",
           headers: {
