@@ -1,4 +1,3 @@
-
 // import React from 'react'
 // import "./table.scss"
 // import { DataGrid } from '@mui/x-data-grid';
@@ -122,7 +121,6 @@
 
 // export default Datatable;
 
-
 // import React, { useState } from 'react';
 // import "./table.scss";
 // import { DataGrid } from '@mui/x-data-grid';
@@ -195,106 +193,114 @@
 // };
 
 // export default Datatable;
-
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "./table.scss";
-import { DataGrid } from '@mui/x-data-grid';
-import { Link } from 'react-router-dom';
-import { DateRangePicker } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
-
+import { DateRangePicker } from "react-date-range";
+import "react-date-range/dist/styles.css"; // main style file
+import "react-date-range/dist/theme/default.css"; // theme css file;
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
 const Datatable = () => {
   const [dateRange, setDateRange] = useState([
     {
       startDate: null,
       endDate: null,
-      key: 'selection',
-    }
+      key: "selection",
+    },
   ]);
   const [filteredRows, setFilteredRows] = useState([]);
-  const [userColumns, setUserColumns] = useState([]);
 
   useEffect(() => {
-    // Fetch data from the backend for columns and rows
-    fetchColumnData(); // Function to fetch column data
-    fetchRowData();    // Function to fetch row data
+    // Fetch data from the backend when the component mounts
+    fetchTableData();
   }, []);
 
-  // Function to fetch column data
-  const fetchColumnData = async () => {
-    try {
-      // Make an API call to get column data
-      // Example response format: { columns: [ { field: 'id', headerName: 'ID' }, ... ] }
-      const response = await fetch('backend/columns');
-      const data = await response.json();
-      setUserColumns(data.columns);
-    } catch (error) {
-      // Handle error
-      console.error('Error fetching column data:', error);
-    }
-  };
+  const fetchTableData = async () => {
+    // Extract the start and end dates from dateRange
+    const startDate = dateRange[0].startDate;
+    const endDate = dateRange[0].endDate;
 
-  // Function to fetch row data
-  const fetchRowData = async () => {
+    if (!startDate || !endDate) {
+      // Handle error or show a message to select dates
+      return;
+    }
+
+    // Format the dates in 'YYYY-MM-DD' format
+    const formattedStartDate = startDate.toISOString().split("T")[0];
+    const formattedEndDate = endDate.toISOString().split("T")[0];
+
     try {
-      // Make an API call to get row data
-      // Example response format: { rows: [ { id: 1, name: 'John Doe' }, ... ] }
-      const response = await fetch('backend/rows');
+      // Make a GET request to your API
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="))
+        .split("=")[1];
+
+      const response = await fetch(
+        `http://localhost:4003/api/dashboard/products?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": token,
+          },
+        }
+      );
+      if (!response.ok) {
+        // Handle any errors or invalid token
+        console.error("Error fetching table data:", response.statusText);
+        return;
+      }
+
       const data = await response.json();
-      setFilteredRows(data.rows);
+      console.log("Respond:", data);
+      setFilteredRows(data);
     } catch (error) {
-      // Handle error
-      console.error('Error fetching row data:', error);
+      // Handle network errors
+      console.error("Error fetching table data:", error);
     }
   };
 
   const handleFilter = () => {
-    // Filter rows based on date range
-    // ... (your existing date range filtering logic)
+    // Call fetchTableData to fetch data based on the selected date range
+    fetchTableData();
   };
 
-  const actionColumn = [
-    {
-      field: "action",
-      headerName: "Action",
-      width: 200,
-      renderCell: () => {
-        return (
-          <div className='cellAction'>
-            <Link to="/users/test" style={{ textDecoration: "none" }}>
-              <div className="viewButton">View</div>
-            </Link>
-            <div className="deleteButton">Delete</div>
-          </div>
-        )
-      }
-    }
-    // Add more action columns if needed
-  ];
-
   return (
-    <div className='datatable'>
+    <div className="datatable">
       <div className="datatableTitle">
         View Products
         <DateRangePicker
-          onChange={item => setDateRange([item.selection])}
+          onChange={(item) => setDateRange([item.selection])}
           ranges={dateRange}
         />
         <button onClick={handleFilter}>Apply Filter</button>
       </div>
-      <DataGrid
-        rows={filteredRows}
-        columns={userColumns.concat(actionColumn)}
-        initialState={{
-          pagination: {
-            paginationModel: { page: 0, pageSize: 5 },
-          },
-        }}
-        pageSizeOptions={[7, 5]}
-        checkboxSelection
-      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>qrCodeData</TableCell>
+              <TableCell>quantity</TableCell>
+              <TableCell>note</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredRows.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell>{row.qrCodeData}</TableCell>
+                <TableCell>{row.quantity}</TableCell>
+                <TableCell>{row.note}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };

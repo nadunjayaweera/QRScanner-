@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const port = 4003;
+const cors = require("cors"); // Import the cors middleware
 
 app.use(express.json());
 
@@ -19,6 +20,10 @@ const logincollection = "users";
 // Require the qrdata module and pass the db and collectionName variables
 const qrproduct = require("./routes/auth/qrdata")(db, collectionName);
 const login = require("./routes/auth/login")(db, logincollection);
+
+// Add CORS middleware before your routes
+app.use(cors());
+
 app.use("/api/dashboard", qrproduct);
 app.use("/api/dashboard", login);
 
