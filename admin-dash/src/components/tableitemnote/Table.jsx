@@ -36,7 +36,7 @@ const DatatableItemnote = () => {
         .split("=")[1];
 
       // Construct the API URL with the provided QR Code Data and date range.
-      const apiUrl = `http://localhost:4003/api/dashboard/qritemdata?qrCodeData=${qrCodeData}`;
+      const apiUrl = `https://backscan.tfdatamaster.com/api/dashboard/qritemdata?qrCodeData=${qrCodeData}`;
 
       const response = await fetch(apiUrl, {
         method: "GET",
