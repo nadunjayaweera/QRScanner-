@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import "./table.scss";
 import { DateRangePicker } from "react-date-range";
-import "react-date-range/dist/styles.css"; // main style file
-import "react-date-range/dist/theme/default.css"; // theme css file;
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,101 +13,113 @@ import Paper from "@mui/material/Paper";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
-const Datatable = () => {
-  const [dateRange, setDateRange] = useState([
-    {
-      startDate: null,
-      endDate: null,
-      key: "selection",
-    },
-  ]);
+const DatatableItemnote = () => {
+  const [qrCodeData, setQrCodeData] = useState("100.100.6SN6.R");
+  const [selectedDate, setSelectedDate] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
+  const [allData, setAllData] = useState([]);
 
   useEffect(() => {
-    // Fetch data from the backend when the component mounts
+    // Initially, load data for an empty QR Code Data.
     fetchTableData();
   }, []);
 
   const fetchTableData = async () => {
-    // Extract the start and end dates from dateRange
-    const startDate = dateRange[0].startDate;
-    const endDate = dateRange[0].endDate;
-    console.log("Start:", startDate);
-    console.log("Enddate", endDate);
-    if (!startDate || !endDate) {
-      // Handle error or show a message to select dates
+    if (!qrCodeData) {
       return;
     }
 
-    // Format the dates in 'YYYY-MM-DD' format
-    const formattedStartDate = startDate;
-    const formattedEndDate = endDate;
-
     try {
-      // Make a GET request to your API
       const token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("token="))
         .split("=")[1];
 
-      const response = await fetch(
-        `http://localhost:4003/api/dashboard/products?startDate=${formattedStartDate}&endDate=${formattedEndDate}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": token,
-          },
-        }
-      );
+      // Construct the API URL with the provided QR Code Data and date range.
+      const apiUrl = `http://localhost:4003/api/dashboard/qritemdata?qrCodeData=${qrCodeData}`;
+
+      const response = await fetch(apiUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": token,
+        },
+      });
+      console.log("Data", response);
+
       if (!response.ok) {
-        // Handle any errors or invalid token
         console.error("Error fetching table data:", response.statusText);
         return;
       }
 
       const data = await response.json();
-      console.log("Respond:", data);
+      setAllData(data);
       setFilteredRows(data);
     } catch (error) {
-      // Handle network errors
       console.error("Error fetching table data:", error);
     }
   };
 
   const handleFilter = () => {
-    // Call fetchTableData to fetch data based on the selected date range
+    filterDataByDate();
+  };
+
+  const filterDataByDate = () => {
+    if (!selectedDate) {
+      setFilteredRows(allData);
+    } else {
+      const filteredData = allData.filter((row) => {
+        const rowDate = new Date(row.date);
+        return rowDate.toDateString() === selectedDate.toDateString();
+      });
+      setFilteredRows(filteredData);
+    }
+  };
+
+  const handleFind = () => {
+    // Make a GET request to the endpoint using qrCodeData
     fetchTableData();
   };
 
   const exportAsPDF = () => {
     const doc = new jsPDF();
-
-    // Create the data for the table (excluding the subtotal)
     const tableData = filteredRows.map((row) => [
       row.qrCodeData,
       row.quantity,
       row.description,
+      new Date(row.date).toLocaleDateString(),
+      row.note,
     ]);
 
-    // Add the table
     doc.autoTable({
-      head: [["QR CodeData", "Quantity", "Description"]],
+      head: [["QR CodeData", "Quantity", "Description", "Date", "Note"]],
       body: tableData,
     });
-    // Save the PDF
     doc.save("checkout_data.pdf");
   };
 
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        View Products
-        <DateRangePicker
-          onChange={(item) => setDateRange([item.selection])}
-          ranges={dateRange}
+        View Product Note
+        <input
+          type="text"
+          placeholder="QR Code Data"
+          value={qrCodeData}
+          onChange={(e) => setQrCodeData(e.target.value)}
         />
-        <button onClick={handleFilter}>Apply Filter</button>
+        <button onClick={handleFind}>Find</button>
+        <DateRangePicker
+          onChange={(item) => setSelectedDate(item.selection.startDate)}
+          ranges={[
+            {
+              startDate: selectedDate,
+              endDate: selectedDate,
+              key: "selection",
+            },
+          ]}
+        />
+        <button onClick={handleFilter}>Filter</button>
         <button onClick={exportAsPDF}>PDF</button>
       </div>
       <TableContainer component={Paper}>
@@ -117,6 +129,8 @@ const Datatable = () => {
               <TableCell>QR Code Data</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>Note</TableCell>
+              <TableCell>Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -125,6 +139,8 @@ const Datatable = () => {
                 <TableCell>{row.qrCodeData}</TableCell>
                 <TableCell>{row.quantity}</TableCell>
                 <TableCell>{row.description}</TableCell>
+                <TableCell>{row.note}</TableCell>
+                <TableCell>{new Date(row.date).toLocaleDateString()}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -134,4 +150,4 @@ const Datatable = () => {
   );
 };
 
-export default Datatable;
+export default DatatableItemnote;

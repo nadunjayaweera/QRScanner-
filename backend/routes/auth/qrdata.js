@@ -30,12 +30,12 @@ module.exports = (db, collectionName) => {
         const data = doc.data();
         const qrCodeData = data.qrCodeData;
         const quantity = data.quantity;
-        const note = data.note;
+        const description = data.description;
 
         if (!dataByQrCodeData[qrCodeData]) {
           dataByQrCodeData[qrCodeData] = {
             quantity: 0,
-            note: note,
+            description: description,
           };
         }
 
@@ -46,7 +46,7 @@ module.exports = (db, collectionName) => {
       const response = Object.keys(dataByQrCodeData).map((qrCodeData) => ({
         qrCodeData,
         quantity: dataByQrCodeData[qrCodeData].quantity,
-        note: dataByQrCodeData[qrCodeData].note,
+        description: dataByQrCodeData[qrCodeData].description,
       }));
 
       res.status(200).json(response);

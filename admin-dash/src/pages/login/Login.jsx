@@ -1,42 +1,3 @@
-// import React from 'react';
-// import "./login.css";
-// import KeyIcon from '@mui/icons-material/Key';
-// import PersonIcon from '@mui/icons-material/Person';
-
-// const Login = () => {
-//   return (
-//     <div className="container">
-//       <div className="header">
-//         <div className="text">Login</div>
-//         <div className="underline"></div>
-//       </div>
-//       <div className="inputs">
-//         <div className="input">
-//           <PersonIcon className='icon1'/>
-//           <input type='text' placeholder='enter your username....' />
-
-//         </div>
-
-//         <div className="input">
-//           <KeyIcon className='icon1'/>
-//           <input type='password' placeholder='enter your password..' />
-
-//         </div>
-
-//       </div>
-
-//       <div className="submit-container">
-//         <div className="submit">
-//           Login
-//         </div>
-//       </div>
-
-//     </div>
-//   )
-// }
-
-// export default Login
-
 import React from "react";
 import "./login.css";
 import KeyIcon from "@mui/icons-material/Key";
@@ -53,7 +14,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        "https://backscan.tfdatamaster.com/api/dashboard/login",
+        "http://localhost:4003/api/dashboard/login",
         {
           method: "POST",
           headers: {
