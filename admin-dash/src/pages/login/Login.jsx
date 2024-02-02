@@ -4,6 +4,7 @@ import KeyIcon from "@mui/icons-material/Key";
 import PersonIcon from "@mui/icons-material/Person";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
+import LoginV from "../../assets/login-vec.jpg";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,29 +50,23 @@ const Login = () => {
   return (
     <div className="container">
       <div class="dots"></div>
-      <img
-        src="https://imgs.search.brave.com/0PB0SWkVa-yxGgW2sFiwVLGhvTsf8JGeMkosIsxe81M/rs:fit:860:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/ZnJlZS12ZWN0b3Iv/c3RvcmUtc3RhZmYt/Y2hlY2stbnVtYmVy/LXByb2R1Y3RzLXRo/YXQtbXVzdC1iZS1k/ZWxpdmVyZWQtY3Vz/dG9tZXJzLWR1cmlu/Zy1kYXlfMTE1MC01/MTA3OS5qcGc_c2l6/ZT02MjYmZXh0PWpw/Zw"
-        alt="backgroundImg"
-      />
+      <img src={LoginV} alt="login-vector" />
       <div className="header">
         <div className="text">Login</div>
+
         <div className="underline"></div>
       </div>
       <div className="inputs">
         <div className="input">
           <PersonIcon className="icon1" />
-          <input
-            type="text"
-            className="custom-input"
-            placeholder="enter your username...."
-          />
+          <input type="text" className="custom-input" placeholder="User Name" />
         </div>
         <div className="input">
           <KeyIcon className="icon1" />
           <input
             type="password"
             className="custom-input"
-            placeholder="enter your password.."
+            placeholder="Password"
           />
         </div>
       </div>

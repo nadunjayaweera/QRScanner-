@@ -12,6 +12,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 
 const DatatableItemnote = () => {
   const [qrCodeData, setQrCodeData] = useState("100.100.6SN6.R");
@@ -101,14 +102,26 @@ const DatatableItemnote = () => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        View Product Note
+        <p className="title-name" style={{ marginLeft: "180px" }}>
+          VIEW PRODUCT
+          <br />
+          NOTE
+        </p>
         <input
+          className="input-f"
           type="text"
           placeholder="QR Code Data"
           value={qrCodeData}
           onChange={(e) => setQrCodeData(e.target.value)}
         />
-        <button onClick={handleFind}>Find</button>
+
+        <button className="button-Find">
+          Find
+          <div class="arrow-wrapper">
+            <div class="arrow"></div>
+          </div>
+        </button>
+
         <DateRangePicker
           onChange={(item) => setSelectedDate(item.selection.startDate)}
           ranges={[
@@ -119,18 +132,30 @@ const DatatableItemnote = () => {
             },
           ]}
         />
-        <button onClick={handleFilter}>Filter</button>
-        <button onClick={exportAsPDF}>PDF</button>
+        <div>
+          <button
+            onClick={handleFilter}
+            class="button"
+            style={{ marginBottom: "20px" }}
+          >
+            <FilterAltIcon />
+            Apply Filter
+          </button>
+
+          <button onClick={exportAsPDF} class="buttonDownload">
+            Download PDF
+          </button>
+        </div>
       </div>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>QR Code Data</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Note</TableCell>
-              <TableCell>Date</TableCell>
+            <TableRow style={{ backgroundColor: "rgb(0, 9, 252)" }}>
+              <TableCell style={{ color: "white" }}>QR Code Data</TableCell>
+              <TableCell style={{ color: "white" }}>Quantity</TableCell>
+              <TableCell style={{ color: "white" }}>Description</TableCell>
+              <TableCell style={{ color: "white" }}>Note</TableCell>
+              <TableCell style={{ color: "white" }}>Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

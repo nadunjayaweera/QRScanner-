@@ -12,6 +12,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
 
 const Datatable = () => {
   const [dateRange, setDateRange] = useState([
@@ -102,21 +103,31 @@ const Datatable = () => {
   return (
     <div className="datatable">
       <div className="datatableTitle">
-        View Products
+        <p className="title-name">VIEW PRODUCTS</p>
         <DateRangePicker
           onChange={(item) => setDateRange([item.selection])}
           ranges={dateRange}
         />
-        <button onClick={handleFilter}>Apply Filter</button>
-        <button onClick={exportAsPDF}>PDF</button>
+        <button
+          onClick={handleFilter}
+          class="button"
+          style={{ marginRight: "20px" }}
+        >
+          <FilterAltIcon />
+          Apply Filter
+        </button>
+
+        <button onClick={exportAsPDF} class="buttonDownload">
+          Download PDF
+        </button>
       </div>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} style={{ marginLeft: "-90px" }}>
         <Table>
           <TableHead>
-            <TableRow>
-              <TableCell>QR Code Data</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Description</TableCell>
+            <TableRow style={{ backgroundColor: "rgb(0, 9, 252)" }}>
+              <TableCell style={{ color: "white" }}>QR Code Data</TableCell>
+              <TableCell style={{ color: "white" }}>Quantity</TableCell>
+              <TableCell style={{ color: "white" }}>Description</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

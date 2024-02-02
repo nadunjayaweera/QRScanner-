@@ -2,25 +2,22 @@ import React from "react";
 import Sidebar from "../../components/sidebar/Sidebar";
 import "./home.scss";
 import "react-circular-progressbar/dist/styles.css";
-import Table from "../../components/table/Table";
+import DatatableItemnote from "../../components/tableitemnote/Table";
 
-const Home = () => {
+const Homenote = () => {
   return (
     <div className="home">
       <Sidebar />
-
       <div className="homeContainer">
         <div className="listContainer">
           <div className="listTitle">
-            <h2 className="title-H">AVAILABLE PRODUCTS</h2>
+            <h2 className="title-H">PRODUCTS NOTE</h2>
           </div>
-          <div style={{ marginLeft: "200px" }}>
-            <Table />
-          </div>
+          <DatatableItemnote />
         </div>
       </div>
     </div>
   );
 };
 
-export default Home;
+export default Homenote;

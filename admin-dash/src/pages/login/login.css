@@ -2,7 +2,7 @@
     margin-top: 30px;
     width: 300px;
     height: auto;
-    max-height: 150px;
+    max-height: 200px;
     align-self: center;
     animation: bounce 1s ease infinite;
     margin-left: 41%;
@@ -50,11 +50,11 @@
     display: flex;
     align-items: center;
     margin: auto;
-    width: 350px;
+    width: 300px;
     height: 40px;
     background: #eaeaea;
     border-radius: 6px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
   }
   
   .input input {
