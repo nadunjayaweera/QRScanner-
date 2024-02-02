@@ -55,5 +55,30 @@ module.exports = (db, collectionName) => {
       res.status(500).json({ error: "Error getting products" });
     }
   });
+
+  router.post("/products", authVerify, async (req, res) => {
+    try {
+      const { qrCodeData, description } = req.body;
+
+      // Validate required fields
+      if (!qrCodeData || !description) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const productsRef = db.collection(collectionName);
+
+      // Create a new document with the provided data
+      await productsRef.add({
+        qrCodeData,
+        description,
+      });
+
+      res.status(201).json({ message: "Product added successfully" });
+    } catch (error) {
+      console.error("Error adding product: ", error);
+      res.status(500).json({ error: "Error adding product" });
+    }
+  });
+
   return router;
 };

@@ -1,7 +1,7 @@
 import React from "react";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
-import Homenote from "./pages/homenotes/Homenote";
+import Homenote from "./pages/homenotes/Home";
 import QRCode from "./pages/qrcode/QRcode";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 function App() {

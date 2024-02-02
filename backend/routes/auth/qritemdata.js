@@ -76,5 +76,30 @@ module.exports = (db, collectionName) => {
     }
   });
 
+  router.get("/qrcodedata", authVerify, async (req, res) => {
+    try {
+      const productsRef = db.collection(collectionName);
+      const snapshot = await productsRef.get();
+
+      if (snapshot.empty) {
+        console.log("No products found.");
+        return res.status(404).json({ message: "No products found" });
+      }
+
+      const qrcodedataList = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          qrCodeData: data.qrCodeData,
+          description: data.description,
+        };
+      });
+
+      res.status(200).json(qrcodedataList);
+    } catch (error) {
+      console.error("Error getting qrcodedata: ", error);
+      res.status(500).json({ error: "Error getting qrcodedata" });
+    }
+  });
+
   return router;
 };
