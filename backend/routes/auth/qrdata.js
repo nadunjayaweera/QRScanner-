@@ -80,5 +80,39 @@ module.exports = (db, collectionName) => {
     }
   });
 
+  router.delete("/productsdelete/:qrCodeData", authVerify, async (req, res) => {
+    try {
+      const qrCodeDataToDelete = req.params.qrCodeData;
+
+      if (!qrCodeDataToDelete) {
+        return res
+          .status(400)
+          .json({ message: "Missing qrCodeData parameter" });
+      }
+
+      const productsRef = db.collection(collectionName);
+
+      // Query the database for the document that matches the qrCodeDataToDelete
+      const snapshot = await productsRef
+        .where("qrCodeData", "==", qrCodeDataToDelete)
+        .get();
+
+      if (snapshot.empty) {
+        console.log(`No product found for qrCodeData: ${qrCodeDataToDelete}`);
+        return res.status(404).json({
+          message: `No product found for qrCodeData: ${qrCodeDataToDelete}`,
+        });
+      }
+
+      // Delete the document
+      snapshot.docs[0].ref.delete();
+
+      res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting product: ", error);
+      res.status(500).json({ error: "Error deleting product" });
+    }
+  });
+
   return router;
 };
