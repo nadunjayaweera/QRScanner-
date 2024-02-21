@@ -15,30 +15,32 @@ import "jspdf-autotable";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 
 const DatatableItemnote = () => {
-  const [qrCodeData, setQrCodeData] = useState("100.100.6SN6.R");
+  const [qrCodeData, setQrCodeData] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [filteredRows, setFilteredRows] = useState([]);
   const [allData, setAllData] = useState([]);
 
   useEffect(() => {
-    // Initially, load data for an empty QR Code Data.
+    // Initially, load all data
     fetchTableData();
   }, []);
 
   const fetchTableData = async () => {
-    if (!qrCodeData) {
-      return;
-    }
-
     try {
       const token = document.cookie
         .split("; ")
         .find((row) => row.startsWith("token="))
         .split("=")[1];
 
-      // Construct the API URL with the provided QR Code Data and date range.
-      const apiUrl = `https://backscan.tfdatamaster.com/api/dashboard/qritemdata?qrCodeData=${qrCodeData}`;
+      let apiUrl = "http://backscan.tfdatamaster.com/api/dashboard/qritemdata";
 
+      if (qrCodeData) {
+        apiUrl += `?qrCodeData=${qrCodeData}`;
+      } else if (selectedDate) {
+        apiUrl += `?startDate=${selectedDate.startDate.toISOString()}&endDate=${selectedDate.endDate.toISOString()}`;
+      }
+      console.log("API URL:", apiUrl);
+      console.log("TOKEN:", token);
       const response = await fetch(apiUrl, {
         method: "GET",
         headers: {
@@ -46,7 +48,6 @@ const DatatableItemnote = () => {
           "auth-token": token,
         },
       });
-      console.log("Data", response);
 
       if (!response.ok) {
         console.error("Error fetching table data:", response.statusText);
@@ -71,14 +72,15 @@ const DatatableItemnote = () => {
     } else {
       const filteredData = allData.filter((row) => {
         const rowDate = new Date(row.date);
-        return rowDate.toDateString() === selectedDate.toDateString();
+        return (
+          rowDate >= selectedDate.startDate && rowDate <= selectedDate.endDate
+        );
       });
       setFilteredRows(filteredData);
     }
   };
 
   const handleFind = () => {
-    // Make a GET request to the endpoint using qrCodeData
     fetchTableData();
   };
 
@@ -115,7 +117,7 @@ const DatatableItemnote = () => {
           onChange={(e) => setQrCodeData(e.target.value)}
         />
 
-        <button className="button-Find">
+        <button className="button-Find" onClick={handleFind}>
           Find
           <div class="arrow-wrapper">
             <div class="arrow"></div>
@@ -123,11 +125,11 @@ const DatatableItemnote = () => {
         </button>
 
         <DateRangePicker
-          onChange={(item) => setSelectedDate(item.selection.startDate)}
+          onChange={(item) => setSelectedDate(item.selection)}
           ranges={[
             {
-              startDate: selectedDate,
-              endDate: selectedDate,
+              startDate: selectedDate?.startDate,
+              endDate: selectedDate?.endDate,
               key: "selection",
             },
           ]}
@@ -141,7 +143,6 @@ const DatatableItemnote = () => {
             <FilterAltIcon />
             Apply Filter
           </button>
-
           <button onClick={exportAsPDF} class="buttonDownload">
             Download PDF
           </button>
