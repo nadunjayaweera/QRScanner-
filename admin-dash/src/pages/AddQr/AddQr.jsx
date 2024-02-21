@@ -9,7 +9,7 @@ const AddQr = () => {
   const [backendResponse, setBackendResponse] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
+    e.preventDefault();
 
     // Send both QR code data and description to the backend with the authorization header
     try {
@@ -26,7 +26,7 @@ const AddQr = () => {
             "Content-Type": "application/json",
             "auth-token": token,
           },
-          body: JSON.stringify({ qrCodeData: qrData, description }),
+          body: JSON.stringify({ qrData, description }),
         }
       );
 
@@ -36,8 +36,14 @@ const AddQr = () => {
       // Clear input fields after successful submission
       setQrData("");
       setDescription("");
+
+      // Refresh the page
+      window.location.reload();
+
+      // TODO: Handle the backend response as needed
     } catch (error) {
       console.error("Error sending data to the backend:", error);
+      // TODO: Handle the error appropriately
     }
   };
 
@@ -71,13 +77,21 @@ const AddQr = () => {
             />
           </div>
 
-          <button type="submit">Submit</button>
+          <button type="submit">Generate QR Code</button>
         </form>
 
         {/* Display QR Code */}
         {qrData && (
           <div className="qrCodeContainer">
             <QRCode value={qrData} />
+          </div>
+        )}
+
+        {/* Display Backend Response */}
+        {backendResponse && (
+          <div className="backendResponse">
+            <p>Backend Response:</p>
+            <pre>{JSON.stringify(backendResponse, null, 2)}</pre>
           </div>
         )}
       </div>

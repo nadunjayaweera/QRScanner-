@@ -13,19 +13,11 @@ import Paper from "@mui/material/Paper";
 import { jsPDF } from "jspdf";
 import QRCode from "react-qr-code";
 import qrcode from "qrcode";
-import DeleteIcon from "@mui/icons-material/Delete";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
 
 const QRcode = () => {
   const [filteredRows, setFilteredRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [confirmationOpen, setConfirmationOpen] = useState(false);
-  const [selectedQrCodeData, setSelectedQrCodeData] = useState(null);
 
   useEffect(() => {
     // Fetch data from the backend when the component mounts
@@ -43,7 +35,7 @@ const QRcode = () => {
         .split("=")[1];
 
       const response = await fetch(
-        "https://backscan.tfdatamaster.com/api/dashboard/qrcodedata",
+        `https://backscan.tfdatamaster.com/api/dashboard/qrcodedata`,
         {
           method: "GET",
           headers: {
@@ -72,14 +64,17 @@ const QRcode = () => {
   const exportQRCode = async (qrCodeData) => {
     try {
       const canvas = document.createElement("canvas");
+      // Set a larger canvas size (e.g., 500x500)
       canvas.width = 500;
       canvas.height = 500;
       const context = canvas.getContext("2d");
 
+      // Generate QR code
       await qrcode.toCanvas(canvas, qrCodeData);
 
+      // Draw the canvas on a larger canvas to improve quality
       const largerCanvas = document.createElement("canvas");
-      largerCanvas.width = 1000;
+      largerCanvas.width = 1000; // Choose a larger size for better quality
       largerCanvas.height = 1000;
       const largerContext = largerCanvas.getContext("2d");
       largerContext.drawImage(
@@ -90,6 +85,7 @@ const QRcode = () => {
         largerCanvas.height
       );
 
+      // Convert the larger canvas to a data URL and trigger a download
       const url = largerCanvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = url;
@@ -98,47 +94,6 @@ const QRcode = () => {
     } catch (error) {
       console.error("Error exporting QR code:", error);
     }
-  };
-
-  const handleDelete = async () => {
-    try {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="))
-        .split("=")[1];
-
-      const response = await fetch(
-        `https://backscan.tfdatamaster.com/api/dashboard/productsdelete/${selectedQrCodeData}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            "auth-token": token,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        console.error("Error deleting QR code:", response.statusText);
-        setError("Error deleting QR code. Please try again.");
-        return;
-      }
-
-      setConfirmationOpen(false);
-
-      // Filter out the deleted item from the table
-      setFilteredRows((prevRows) =>
-        prevRows.filter((row) => row.qrCodeData !== selectedQrCodeData)
-      );
-    } catch (error) {
-      console.error("Error deleting QR code:", error);
-      setError("Error deleting QR code. Please try again.");
-    }
-  };
-
-  const handleDeleteIconClick = (qrCodeData) => {
-    setConfirmationOpen(true);
-    setSelectedQrCodeData(qrCodeData);
   };
 
   return (
@@ -158,7 +113,6 @@ const QRcode = () => {
                   <TableCell>Description</TableCell>
                   <TableCell>QR Code</TableCell>
                   <TableCell>Download</TableCell>
-                  <TableCell>Delete</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -174,34 +128,11 @@ const QRcode = () => {
                         Download
                       </button>
                     </TableCell>
-                    <TableCell>
-                      <DeleteIcon
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleDeleteIconClick(row.qrCodeData)}
-                      />
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </TableContainer>
-
-          {/* Confirmation Dialog */}
-          <Dialog
-            open={confirmationOpen}
-            onClose={() => setConfirmationOpen(false)}
-          >
-            <DialogTitle>Confirm Deletion</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Are you sure you want to delete this item?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <button onClick={() => setConfirmationOpen(false)}>Cancel</button>
-              <button onClick={handleDelete}>Delete</button>
-            </DialogActions>
-          </Dialog>
         </>
       )}
     </div>
